@@ -29,10 +29,6 @@ install_requires = [
 tests_require = [
 ]
 
-django_require = [
-    'django'
-]
-
 dextr_require = [
     'dextr'
 ]

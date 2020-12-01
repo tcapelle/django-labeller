@@ -249,8 +249,9 @@ def flask_labeller(label_classes, labelled_images, tasks=None, colour_schemes=No
     if socketio is not None:
         socketio.run(app, debug=debug, port=port, use_reloader=use_reloader)
     else:
-        app.run(debug=debug, port=port, use_reloader=use_reloader)
+        app.run(host='0.0.0.0', debug=debug, port=port, use_reloader=use_reloader)
 
+    return app
 
 
 @click.command()
@@ -451,9 +452,10 @@ def run_app(images_pat, labels_dir, readonly, update_label_object_ids,
         dict(name='classification', human_name='Classification'),
     ]
 
-    flask_labeller(label_classes, labelled_images, tasks=tasks, colour_schemes=colour_schemes,
-                   anno_controls=anno_controls, config=config, dextr_fn=dextr_fn)
+    app = flask_labeller(label_classes, labelled_images, tasks=tasks, colour_schemes=colour_schemes,
+                         anno_controls=anno_controls, config=config, dextr_fn=dextr_fn)
 
+    return app
 
 if __name__ == '__main__':
     run_app()
