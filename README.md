@@ -77,7 +77,7 @@ If you want to use a custom DEXTR model that you trained for your purposes, use 
 you can run the image with portforwarding (default 5000) using the following command
 
 ```bash
-docker run -p 5000:5000 fastlabel 
+docker run -p 5000:5000 --rm fastlabel 
 ```
 
 It is licensed under the MIT license.
