@@ -3,7 +3,7 @@ import fnmatch
 from setuptools import find_packages
 from setuptools import setup
 
-version = '0.1.2'
+version = '0.0.1'
 
 here = os.path.abspath(os.path.dirname(__file__))
 try:
@@ -51,9 +51,9 @@ data_files = [
 ]
 
 setup(
-    name="django-labeller",
+    name="fastlabel",
     version=version,
-    description="An image labelling tool for creating segmentation data sets, for Django and Flask.",
+    description="An image labelling tool for creating segmentation data sets made with Flask.",
     long_description="\n\n".join([README]),
     classifiers=[
         "Development Status :: 3 - Alpha",
@@ -64,9 +64,9 @@ setup(
         "Topic :: Software Development :: User Interfaces",
     ],
     keywords="",
-    author="Geoffrey French",
+    author="Thomas Capelle,
     # author_email="brittix1023 at gmail dot com",
-    url="https://github.com/uea-computer-vision/django-labeller",
+    url="https://github.com/tcapelle/fastlabel",
     license="MIT",
     packages=find_packages(),
     include_package_data=include_package_data,
@@ -75,7 +75,6 @@ setup(
     install_requires=install_requires,
     extras_require={
         'testing': tests_require,
-        'django': django_require,
         'dextr': dextr_require,
     },
 )
