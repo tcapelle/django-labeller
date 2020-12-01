@@ -37,7 +37,7 @@ An example Flask-based web app is provided that displays the labelling tool with
 change into the same directory into which you cloned the repo and run:
  
 ```bash
-> python -m image_labelling_tool.flask_labeller 
+> python -m fastlabel.flask_labeller 
 ```
 
 Now open `0.0.0.0:5000` within a browser.
@@ -46,11 +46,11 @@ If you want to load images from a different directory, or if you installed from 
 where to look:
 
 ```bash
-> python -m image_labelling_tool.flask_labeller --images_pat=<images_directory>/*.<jpg|png>
+> python -m fastlabel.flask_labeller --images_pat=<images_directory>/*.<jpg|png>
 ```
 
 
-#### Flask app with DEXTR assisted labelling
+### Flask app with DEXTR assisted labelling
 
 First, install the [dextr](https://github.com/Britefury/dextr) library:
 
@@ -61,7 +61,7 @@ First, install the [dextr](https://github.com/Britefury/dextr) library:
 Now tell the Flask app to enable DEXTR using the `--enable_dextr` option:
 
 ```shell script
-> python -m image_labelling_tool.flask_labeller --enable_dextr
+> python -m fastlabel.flask_labeller --enable_dextr
 ````
  
 The above will use the ResNet-101 based DEXTR model trained on Pascal VOC 2012 that is provided by
@@ -69,8 +69,15 @@ the dextr library.
 If you want to use a custom DEXTR model that you trained for your purposes, use the `--dextr_weights` option:
 
 ```shell script
-> python -m image_labelling_tool.flask_labeller --dextr_weights=path/to/model.pth
-````
+> python -m fastlabel.flask_labeller --dextr_weights=path/to/model.pth
+```
 
+## Docker
+
+you can run the image with portforwarding (default 5000) using the following command
+
+```bash
+docker run -p 5000:5000 fastlabel 
+```
 
 It is licensed under the MIT license.

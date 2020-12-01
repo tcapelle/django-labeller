@@ -14,7 +14,5 @@ ENV HOST=0.0.0.0
 
 EXPOSE ${PORT}
 
-RUN python -m image_labelling_tool.flask_labeller --enable_dextr
-
-ENTRYPOINT /bin/bash
+CMD python -m fastlabel.flask_labeller
 
