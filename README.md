@@ -1,5 +1,8 @@
 # fastlabel
 
+This app is based on [django-labeller](https://github.com/Britefury/django-labeller) and extracting only the flask part.
+The main idea is update the pytorch model bindings to make easy the active learning approach.
+
 #### A light-weight image labelling tool for Python designed for creating segmentation data sets.
 
 - Flask based
