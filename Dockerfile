@@ -2,8 +2,8 @@
 FROM python:3.8-slim
 
 # Copy and install requirements.txt first for caching
-COPY . /django-labeller
-WORKDIR /django-labeller
+COPY . /fastlabel
+WORKDIR /fastlabel
 
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt

@@ -14,6 +14,9 @@ The main idea is update the pytorch model bindings to make easy the active learn
   [dextr](https://github.com/Britefury/dextr) library
 
 
+in action:
+![Movie](doc/dextr_boolean_cleanup_v1_small.gif "in action")
+
 ## Flask
 
 If you want to run `django-labeller` on your local machine with minimum fuss and store the image and
