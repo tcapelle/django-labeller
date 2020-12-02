@@ -23,17 +23,18 @@
 # Developed by Geoffrey French in collaboration with Dr. M. Fisher and
 # Dr. M. Mackiewicz.
 
-import click
-import json
-import uuid
-import numpy as np
 
-from flask import Flask, render_template, request, make_response, send_from_directory
-try:
-    from flask_socketio import SocketIO, emit as socketio_emit
-except ImportError:
-    SocketIO = None
-    socketio_emit = None
+import click
+    import json
+    import uuid
+    import numpy as np
+
+    from flask import Flask, render_template, request, make_response, send_from_directory
+    try:
+        from flask_socketio import SocketIO, emit as socketio_emit
+    except ImportError:
+        SocketIO = None
+        socketio_emit = None
 
 from fastlabel import labelling_tool
 
@@ -99,10 +100,6 @@ def flask_labeller(label_classes, labelled_images, tasks=None, colour_schemes=No
                 }
             }
         }
-
-
-    if tasks is None:
-        tasks = [dict(identifier='finished', human_name='Finished')]
 
 
     @app.route('/')
@@ -240,7 +237,7 @@ def flask_labeller(label_classes, labelled_images, tasks=None, colour_schemes=No
     @app.route('/image/<image_id>')
     def get_image(image_id):
         image = images_table[image_id]
-        data, mimetype, width, height = image.data_and_mime_type_and_size()
+        data, mimetype = image.data_and_mime_type()
         r = make_response(data)
         r.mimetype = mimetype
         return r
@@ -250,9 +247,9 @@ def flask_labeller(label_classes, labelled_images, tasks=None, colour_schemes=No
     if socketio is not None:
         socketio.run(app, debug=debug, port=port, use_reloader=use_reloader)
     else:
-        app.run(host='0.0.0.0', debug=debug, port=port, use_reloader=use_reloader)
+        app.run(debug=debug, port=port, use_reloader=use_reloader)
 
-    return app
+ return app
 
 
 @click.command()
@@ -454,9 +451,8 @@ def run_app(images_pat, labels_dir, readonly, update_label_object_ids,
     ]
 
     app = flask_labeller(label_classes, labelled_images, tasks=tasks, colour_schemes=colour_schemes,
-                         anno_controls=anno_controls, config=config, dextr_fn=dextr_fn)
+                   anno_controls=anno_controls, config=config, dextr_fn=dextr_fn)
 
     return app
-
 if __name__ == '__main__':
     run_app()
