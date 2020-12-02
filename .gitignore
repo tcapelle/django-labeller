@@ -1,7 +1,7 @@
 images/foxglove__labels.json
 images/uea_snow_1__labels.json
 images/foxglove__labels.json
-my_unet.pth
+models/
 
 tmp*
 Untitled*.ipynb
