@@ -62,7 +62,7 @@ Now tell the Flask app to enable DEXTR using the `--enable_dextr` option:
 
 ```shell script
 > python -m fastlabel.flask_labeller --enable_dextr
-````
+```
  
 The above will use the ResNet-101 based DEXTR model trained on Pascal VOC 2012 that is provided by
 the dextr library. 
