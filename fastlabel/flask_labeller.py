@@ -22,11 +22,9 @@
 #
 # Developed by Geoffrey French in collaboration with Dr. M. Fisher and
 # Dr. M. Mackiewicz.
+
+
 import click
-
-
-def flask_labeller(label_classes, labelled_images, tasks=None, colour_schemes=None, anno_controls=None,
-                   config=None, dextr_fn=None, use_reloader=True, debug=True, port=None):
     import json
     import uuid
     import numpy as np
@@ -38,7 +36,11 @@ def flask_labeller(label_classes, labelled_images, tasks=None, colour_schemes=No
         SocketIO = None
         socketio_emit = None
 
-    from image_labelling_tool import labelling_tool
+from fastlabel import labelling_tool
+
+def flask_labeller(label_classes, labelled_images, tasks=None, colour_schemes=None, anno_controls=None,
+                   config=None, dextr_fn=None, use_reloader=True, debug=True, port=None):
+
 
     # Generate image IDs list
     image_ids = [str(i)   for i in range(len(labelled_images))]
@@ -98,10 +100,6 @@ def flask_labeller(label_classes, labelled_images, tasks=None, colour_schemes=No
                 }
             }
         }
-
-
-    if tasks is None:
-        tasks = [dict(identifier='finished', human_name='Finished')]
 
 
     @app.route('/')
@@ -239,7 +237,7 @@ def flask_labeller(label_classes, labelled_images, tasks=None, colour_schemes=No
     @app.route('/image/<image_id>')
     def get_image(image_id):
         image = images_table[image_id]
-        data, mimetype, width, height = image.data_and_mime_type_and_size()
+        data, mimetype = image.data_and_mime_type()
         r = make_response(data)
         r.mimetype = mimetype
         return r
@@ -251,6 +249,7 @@ def flask_labeller(label_classes, labelled_images, tasks=None, colour_schemes=No
     else:
         app.run(debug=debug, port=port, use_reloader=use_reloader)
 
+ return app
 
 
 @click.command()
@@ -266,7 +265,7 @@ def run_app(images_pat, labels_dir, readonly, update_label_object_ids,
     import glob
     import json
     import uuid
-    from image_labelling_tool import labelling_tool
+    from fastlabel import labelling_tool
 
     if enable_dextr or dextr_weights is not None:
         from dextr.model import DextrModel
@@ -451,9 +450,9 @@ def run_app(images_pat, labels_dir, readonly, update_label_object_ids,
         dict(name='classification', human_name='Classification'),
     ]
 
-    flask_labeller(label_classes, labelled_images, tasks=tasks, colour_schemes=colour_schemes,
+    app = flask_labeller(label_classes, labelled_images, tasks=tasks, colour_schemes=colour_schemes,
                    anno_controls=anno_controls, config=config, dextr_fn=dextr_fn)
 
-
+    return app
 if __name__ == '__main__':
     run_app()
