@@ -5,6 +5,12 @@
         "natural": "Natural",
         "artificial": "Artificial"
     },
+    "Tasks": 
+    {
+        "finished": "[old] finished'",            
+        "natural": "Outlines",
+        "segmentation": "Classification"
+    },
     "Label Classes": 
     {
         "Natural": 

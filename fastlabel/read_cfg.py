@@ -7,15 +7,21 @@ from .labelling_tool import (
     AnnoControlPopupMenu)
 
 
-__all__ = ['get_color_schemes', 'get_labels', 'get_anno_controls']
+__all__ = ['get_color_schemes', 'get_tasks', 'get_labels', 'get_anno_controls']
 
-SECTIONS = {"colours": 'Colour Schemes', "labels":"Label Classes", "controls":"Annotation Controls"}
+SECTIONS = {"colours": 'Colour Schemes', "tasks": "Tasks", "labels":"Label Classes", "controls":"Annotation Controls"}
 
 def get_color_schemes(cfg, section=SECTIONS["colours"]):
     colour_schemes = [
     dict(name=key, human_name=value) for key, value in cfg[section].items()
     ]
     return colour_schemes
+
+def get_tasks(cfg, section=SECTIONS["tasks"]):
+    tasks = [
+    dict(name=key, human_name=value) for key, value in cfg[section].items()
+    ]
+    return tasks
 
 def get_labels(cfg, section=SECTIONS["labels"]):
     "Extract labels from json"

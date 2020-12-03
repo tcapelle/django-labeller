@@ -3,16 +3,22 @@
     {
         "default": "All"          
     },
+    "Tasks": 
+    {
+        "segmentation": "Segment Clouds",
+        "contemplate": "Contemplate",
+        "flag": "Flag bad image"
+    },
     "Label Classes": 
     {
-        "Natural": 
+        "Sky": 
         {
             "cloud": 
             {
                 "name":"Clouds", 
                 "colours":
                 {
-                    "default": [0, 0, 255]
+                    "default": [128, 128, 0]
                 }
             },
             "sun":
@@ -23,12 +29,12 @@
                     "default": [255, 0, 0]
                 }
             },
-            "other":
+            "bugs":
             {
-                "name": "Other",
+                "name": "Bugs",
                 "colours":
                 {
-                    "default": [255, 96, 192]
+                    "default": [50, 50, 50]
                 }
             }
         }

@@ -77,6 +77,7 @@ def flask_labeller(label_classes, labelled_images, tasks=None, colour_schemes=No
         pixels = image.read_pixels()
         dextr_points = np.array([[p['y'], p['x']] for p in dextr_points_js])
         if dextr_fn is not None:
+            print(f'dextr call: {pixels.shape=}, points={dextr_points}')
             mask = dextr_fn(pixels, dextr_points)
             regions = PolygonLabel.mask_image_to_regions_cv(mask, sort_decreasing_area=True)
             regions_js = PolygonLabel.regions_to_json(regions)
@@ -295,6 +296,7 @@ def run_app(images_pat, labels_dir, readonly, update_label_object_ids,
     colour_schemes = get_color_schemes(cfg)
     label_classes = get_labels(cfg)
     anno_controls = get_anno_controls(cfg)
+    tasks = get_tasks(cfg)
 
     if images_pat.strip() == '':
         image_paths = glob.glob('images/*.jpg') + glob.glob('images/*.png')
@@ -347,12 +349,6 @@ def run_app(images_pat, labels_dir, readonly, update_label_object_ids,
             'brushKeyRate': 2.0,    # Change rate for brush radius (keyboard)
         }
     }
-
-    tasks = [
-        dict(name='finished', human_name='[old] finished'),
-        dict(name='segmentation', human_name='Outlines'),
-        dict(name='classification', human_name='Classification'),
-    ]
 
     app = flask_labeller(label_classes, labelled_images, tasks=tasks, colour_schemes=colour_schemes,
                    anno_controls=anno_controls, config=config, dextr_fn=dextr_fn)
