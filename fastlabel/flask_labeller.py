@@ -271,7 +271,7 @@ def run_app(images_pat, labels_dir, readonly, update_label_object_ids,
             enable_dextr, dextr_weights):
 
 
-    with open('fastlabel/templates/interface_settings.json') as f:
+    with open('fastlabel/templates/interface_settings_clouds.json') as f:
         cfg = json.load(f)
 
     if enable_dextr or dextr_weights is not None:

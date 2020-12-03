@@ -1,0 +1,67 @@
+{
+    "Colour Schemes": 
+    {
+        "default": "All"          
+    },
+    "Label Classes": 
+    {
+        "Natural": 
+        {
+            "cloud": 
+            {
+                "name":"Clouds", 
+                "colours":
+                {
+                    "default": [0, 0, 255]
+                }
+            },
+            "sun":
+            {
+                "name": "Sun",
+                "colours":
+                {
+                    "default": [255, 0, 0]
+                }
+            },
+            "other":
+            {
+                "name": "Other",
+                "colours":
+                {
+                    "default": [255, 96, 192]
+                }
+            }
+        }
+    },
+    "Annotation Controls": 
+    {
+        "Checkbox":
+        {
+            "id":"good_quality",
+            "name": "Good Quality"
+        },
+        "RadioButtons":
+        {
+            "id": "visibility",
+            "name": "Sun is Visible",
+            "choices": 
+            [
+                {
+                    "value": "full",
+                    "label_text": "Fully",
+                    "tooltip": "Sun is fully visible"
+                },
+                {
+                    "value": "mostly",
+                    "label_text": "Mostly",
+                    "tooltip": "Sun is mostly visible"
+                },
+                {
+                    "value": "obscured",
+                    "label_text": "Obscured",
+                    "tooltip": "Sun is significantly obscured"
+                }
+            ]
+        }
+    }
+}
