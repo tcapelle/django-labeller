@@ -23,20 +23,28 @@
 # Developed by Geoffrey French in collaboration with Dr. M. Fisher and
 # Dr. M. Mackiewicz.
 
-
+import os
+import glob
 import click
-    import json
-    import uuid
-    import numpy as np
+import json
+import uuid
+import numpy as np\
 
-    from flask import Flask, render_template, request, make_response, send_from_directory
-    try:
-        from flask_socketio import SocketIO, emit as socketio_emit
-    except ImportError:
-        SocketIO = None
-        socketio_emit = None
+from flask import Flask, render_template, request, make_response, send_from_directory
+try:
+    from flask_socketio import SocketIO, emit as socketio_emit
+except ImportError:
+    SocketIO = None
+    socketio_emit = None
 
-from fastlabel import labelling_tool
+from .labelling_tool import (
+    image_descriptor,
+    PolygonLabel,
+    PersistentLabelledImage,
+    ensure_json_object_ids_have_prefix,
+    LabelClassGroup)
+
+from .read_cfg import *
 
 def flask_labeller(label_classes, labelled_images, tasks=None, colour_schemes=None, anno_controls=None,
                    config=None, dextr_fn=None, use_reloader=True, debug=True, port=None):
@@ -51,7 +59,7 @@ def flask_labeller(label_classes, labelled_images, tasks=None, colour_schemes=No
     image_descriptors = []
     for image_id, img in zip(image_ids, labelled_images):
         height, width = img.image_size
-        image_descriptors.append(labelling_tool.image_descriptor(
+        image_descriptors.append(image_descriptor(
             image_id=image_id, url='/image/{}'.format(image_id),
             width=width, height=height
         ))
@@ -70,8 +78,8 @@ def flask_labeller(label_classes, labelled_images, tasks=None, colour_schemes=No
         dextr_points = np.array([[p['y'], p['x']] for p in dextr_points_js])
         if dextr_fn is not None:
             mask = dextr_fn(pixels, dextr_points)
-            regions = labelling_tool.PolygonLabel.mask_image_to_regions_cv(mask, sort_decreasing_area=True)
-            regions_js = labelling_tool.PolygonLabel.regions_to_json(regions)
+            regions = PolygonLabel.mask_image_to_regions_cv(mask, sort_decreasing_area=True)
+            regions_js = PolygonLabel.regions_to_json(regions)
             return regions_js
         else:
             return []
@@ -104,7 +112,7 @@ def flask_labeller(label_classes, labelled_images, tasks=None, colour_schemes=No
 
     @app.route('/')
     def index():
-        label_classes_json = [(cls.to_json() if isinstance(cls, labelling_tool.LabelClassGroup) else cls)
+        label_classes_json = [(cls.to_json() if isinstance(cls, LabelClassGroup) else cls)
                                for cls in label_classes]
         if anno_controls is not None:
             anno_controls_json = [c.to_json() for c in anno_controls]
@@ -249,7 +257,7 @@ def flask_labeller(label_classes, labelled_images, tasks=None, colour_schemes=No
     else:
         app.run(debug=debug, port=port, use_reloader=use_reloader)
 
- return app
+    return app
 
 
 @click.command()
@@ -261,11 +269,10 @@ def flask_labeller(label_classes, labelled_images, tasks=None, colour_schemes=No
 @click.option('--dextr_weights', type=click.Path())
 def run_app(images_pat, labels_dir, readonly, update_label_object_ids,
             enable_dextr, dextr_weights):
-    import os
-    import glob
-    import json
-    import uuid
-    from fastlabel import labelling_tool
+
+
+    with open('fastlabel/templates/interface_settings.json') as f:
+        cfg = json.load(f)
 
     if enable_dextr or dextr_weights is not None:
         from dextr.model import DextrModel
@@ -285,112 +292,9 @@ def run_app(images_pat, labels_dir, readonly, update_label_object_ids,
     else:
         dextr_fn = None
 
-
-    # Colour schemes
-    # The user may select different colour schemes for different tasks.
-    # If you have a lot of classes, it will be difficult to select colours that are easily distinguished
-    # from one another. For one task e.g. segmentation, design a colour scheme that highlights the different
-    # classes for that task, while another task e.g. fine-grained classification would use another scheme.
-    # Each colour scheme is a dictionary containing the following:
-    #   name: symbolic name (Python identifier)
-    #   human_name: human readable name for UI
-    # These colour schemes are going to split the classes by 'default' (all), natural, and artificial.
-    # Not really useful, but demonstrates the feature.
-    colour_schemes = [
-        dict(name='default', human_name='All'),
-        dict(name='natural', human_name='Natural'),
-        dict(name='artificial', human_name='Artifical')
-    ]
-
-    # Specify our label classes, organised in groups.
-    # `LabelClass` parameters are:
-    #   symbolic name (Python identifier)
-    #   human readable name for UI
-    #   and colours by colour scheme, as a dict mapping colour scheme name to RGB value as a list
-    # The label classes are arranged in groups and will be displayed as such in the UI.
-    # `LabelClassGroup` parameters are:
-    #   human readable name for UI
-    #   label class (`LabelClass` instance) list
-    label_classes = [
-        labelling_tool.LabelClassGroup('Natural', [
-            labelling_tool.LabelClass('tree', 'Trees', dict(default=[0, 255, 192], natural=[0, 255, 192],
-                                                            artificial=[128, 128, 128])),
-            labelling_tool.LabelClass('lake', 'Lake', dict(default=[0, 128, 255], natural=[0, 128, 255],
-                                                           artificial=[128, 128, 128])),
-            labelling_tool.LabelClass('flower', 'Flower', dict(default=[255, 96, 192], natural=[255, 192, 96],
-                                                               artificial=[128, 128, 128])),
-            labelling_tool.LabelClass('leaf', 'Leaf', dict(default=[65, 255, 0], natural=[65, 255, 0],
-                                                           artificial=[128, 128, 128])),
-            labelling_tool.LabelClass('stem', 'Stem', dict(default=[128, 64, 0], natural=[128, 64, 0],
-                                                           artificial=[128, 128, 128])),
-        ]),
-        labelling_tool.LabelClassGroup('Artificial', [
-            labelling_tool.LabelClass('building', 'Buildings', dict(default=[255, 128, 0], natural=[128, 128, 128],
-                                                                   artificial=[255, 128, 0])),
-            labelling_tool.LabelClass('wall', 'Wall', dict(default=[0, 128, 255], natural=[128, 128, 128],
-                                                           artificial=[0, 128, 255])),
-        ])]
-
-    # Annotation controls
-    # Labels may also have optional meta-data associated with them
-    # You could use this for e.g. indicating if an object is fully visible, mostly visible or significantly obscured.
-    # You could also indicate quality (e.g. blurriness, etc)
-    # There are three types of annotation:
-    # Check box (boolean value):
-    #   `labelling_tool.AnnoControlCheckbox` parameters:
-    #       name: symbolic name (Python identifier)
-    #       label_text: label text in UI
-    # Radio button (choice from a list):
-    #   `labelling_tool.AnnoControlRadioButtons` parameters:
-    #       name: symbolic name (Python identifier)
-    #       label_text: label text in UI
-    #       choices: list of `labelling_tool.AnnoControlRadioButtons.choice` that provide:
-    #           value: symbolic value name for choice
-    #           label_text: choice label text in UI
-    #           tooltip: extra information for user
-    #       label_on_own_line [optional]: if True, place the label and the buttons on a separate line in the UI
-    # Popup menu (choice from a grouped list):
-    #   `labelling_tool.AnnoControlPopupMenu` parameters:
-    #       name: symbolic name (Python identifier)
-    #       label_text: label text in UI
-    #       groups: list of groups `labelling_tool.AnnoControlPopupMenu.group`:
-    #           label_text: group label text in UI
-    #           choices: list of `labelling_tool.AnnoControlPopupMenu.choice` that provide:
-    #               value: symbolic value name for choice
-    #               label_text: choice label text in UI
-    #               tooltip: extra information for user
-    anno_controls = [
-        labelling_tool.AnnoControlCheckbox('good_quality', 'Good quality'),
-        labelling_tool.AnnoControlRadioButtons('visibility', 'Visible', choices=[
-            labelling_tool.AnnoControlRadioButtons.choice(value='full', label_text='Fully',
-                                                          tooltip='Object is fully visible'),
-            labelling_tool.AnnoControlRadioButtons.choice(value='mostly', label_text='Mostly',
-                                                          tooltip='Object is mostly visible'),
-            labelling_tool.AnnoControlRadioButtons.choice(value='obscured', label_text='Obscured',
-                                                          tooltip='Object is significantly obscured'),
-        ], label_on_own_line=False),
-        labelling_tool.AnnoControlPopupMenu('material', 'Material', groups=[
-            labelling_tool.AnnoControlPopupMenu.group(label_text='Artifical/buildings', choices=[
-                labelling_tool.AnnoControlPopupMenu.choice(value='concrete', label_text='Concrete',
-                                                           tooltip='Concrete objects'),
-                labelling_tool.AnnoControlPopupMenu.choice(value='plastic', label_text='Plastic',
-                                                           tooltip='Plastic objects'),
-                labelling_tool.AnnoControlPopupMenu.choice(value='asphalt', label_text='Asphalt',
-                                                           tooltip='Road, pavement, etc.'),
-            ]),
-            labelling_tool.AnnoControlPopupMenu.group(label_text='Flat natural', choices=[
-                labelling_tool.AnnoControlPopupMenu.choice(value='grass', label_text='Grass',
-                                                           tooltip='Grass covered ground'),
-                labelling_tool.AnnoControlPopupMenu.choice(value='water', label_text='Water', tooltip='Water/lake')]),
-            labelling_tool.AnnoControlPopupMenu.group(label_text='Vegetation', choices=[
-                labelling_tool.AnnoControlPopupMenu.choice(value='trees', label_text='Trees', tooltip='Trees'),
-                labelling_tool.AnnoControlPopupMenu.choice(value='shrubbery', label_text='Shrubs',
-                                                           tooltip='Shrubs/bushes'),
-                labelling_tool.AnnoControlPopupMenu.choice(value='flowers', label_text='Flowers',
-                                                           tooltip='Flowers'),
-                labelling_tool.AnnoControlPopupMenu.choice(value='ivy', label_text='Ivy', tooltip='Ivy')]),
-        ])
-    ]
+    colour_schemes = get_color_schemes(cfg)
+    label_classes = get_labels(cfg)
+    anno_controls = get_anno_controls(cfg)
 
     if images_pat.strip() == '':
         image_paths = glob.glob('images/*.jpg') + glob.glob('images/*.png')
@@ -398,7 +302,7 @@ def run_app(images_pat, labels_dir, readonly, update_label_object_ids,
         image_paths = glob.glob(images_pat)
 
     # Load in .JPG images from the 'images' directory.
-    labelled_images = labelling_tool.PersistentLabelledImage.for_files(
+    labelled_images = PersistentLabelledImage.for_files(
         image_paths, labels_dir=labels_dir, readonly=readonly)
     print('Loaded {0} images'.format(len(labelled_images)))
 
@@ -408,7 +312,7 @@ def run_app(images_pat, labels_dir, readonly, update_label_object_ids,
             if os.path.exists(limg.labels_path):
                 label_js = json.load(open(limg.labels_path, 'r'))
                 prefix = str(uuid.uuid4())
-                modified = labelling_tool.ensure_json_object_ids_have_prefix(
+                modified = ensure_json_object_ids_have_prefix(
                     label_js, id_prefix=prefix)
                 if modified:
                     with open(limg.labels_path, 'w') as f_out:

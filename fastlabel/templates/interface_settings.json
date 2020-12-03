@@ -1,0 +1,190 @@
+{
+    "Colour Schemes": 
+    {
+        "default": "All",            
+        "natural": "Natural",
+        "artificial": "Artificial"
+    },
+    "Label Classes": 
+    {
+        "Natural": 
+        {
+            "tree": 
+            {
+                "name":"Tree", 
+                "colours":
+                {
+                    "default": [0, 255, 192],
+                    "natural": [0, 255, 192],
+                    "artificial": [128, 128, 128]
+                }
+            },
+            "lake":
+            {
+                "name": "Lake",
+                "colours":
+                {
+                    "default": [0, 128, 255], 
+                    "natural": [0, 128, 255],                                           
+                    "artificial": [128, 128, 128]
+                }
+            },
+            "flower":
+            {
+                "name": "Flower",
+                "colours":
+                {
+                    "default": [255, 96, 192],
+                    "natural": [255, 192, 96],
+                    "artificial": [128, 128, 128]
+                }
+            },
+            "leaf":
+            {
+                "name": "Leaf",
+                "colours":
+                {
+                    "default": [65, 255, 0],
+                    "natural": [65, 255, 0],
+                    "artificial": [128, 128, 128]
+                }
+                
+            },
+            "stem":
+            {
+                "name": "Stem",
+                "colours":
+                {
+                    "default": [128, 64, 0],
+                    "natural": [128, 64, 0],
+                    "artificial": [128, 128, 128]
+                }
+            }
+        },
+        "Artificial":
+        {
+            "building": 
+            {
+                "name": "Building",
+                "colours":
+                {
+                    "default": [255, 128, 0],
+                    "natural": [128, 128, 128],
+                    "artificial": [255, 128, 0]
+                }
+            },
+            "wall":
+            {
+                "name": "Wall",
+                "colours":
+                 {
+                    "default": [0, 128, 255],
+                    "natural": [128, 128, 128],
+                    "artificial": [0, 128, 255]
+                }               
+            }
+        }
+    },
+    "Annotation Controls": 
+    {
+        "Checkbox":
+        {
+            "id":"good_quality",
+            "name": "Good Quality"
+        },
+        "RadioButtons":
+        {
+            "id": "visibility",
+            "name": "Visible",
+            "choices": 
+            [
+                {
+                    "value": "full",
+                    "label_text": "Fully",
+                    "tooltip": "Object is fully visible"
+                },
+                {
+                    "value": "mostly",
+                    "label_text": "Mostly",
+                    "tooltip": "Object is mostly visible"
+                },
+                {
+                    "value": "obscured",
+                    "label_text": "Obscured",
+                    "tooltip": "Object is significantly obscured"
+                }
+            ]
+        },
+        "PopUp":
+        {
+            "id": "material",
+            "name": "Material",
+            "groups":
+            [
+                {
+                    "label_text":"Artifical/buildings",
+                    "choices":
+                    [
+                        {
+                            "value": "concrete",
+                            "label_text": "Concrete",
+                            "tooltip": "Concrete Object obviusly!"
+                        },
+                        {
+                            "value": "plastic",
+                            "label_text": "Plastic",
+                            "tooltip": "Plastic Object obviusly!"
+                        },
+                        {
+                            "value": "asphalt",
+                            "label_text": "Asphalt",
+                            "tooltip": "Road, pavement, etc."
+                        }
+                    ]
+                },
+                {
+                    "label_text": "Flat natural",
+                    "choices":
+                    [
+                        {
+                            "value": "grass",
+                            "label_text": "Grass",
+                            "tooltip": "Grass covered surface"
+                        },
+                        {
+                            "value": "water",
+                            "label_text": "Water",
+                            "tooltip": "Water, Lake, sea, etc.."
+                        }
+                    ]
+                },
+                {
+                    "label_text": "Vegetation",
+                    "choices":
+                    [
+                        {
+                            "value": "trees",
+                            "label_text": "Trees",
+                            "tooltip": "Tall Trees"
+                        },
+                        {
+                            "value": "shrubbery",
+                            "label_text": "Shrubs",
+                            "tooltip": "Shrubs/bushes'"
+                        },
+                        {
+                            "value": "flowers",
+                            "label_text": "Flowers",
+                            "tooltip": "Flowers"
+                        },
+                        {
+                            "value": "ivy",
+                            "label_text": "Ivy",
+                            "tooltip": "Ivy"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
